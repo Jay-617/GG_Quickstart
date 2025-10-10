@@ -48,7 +48,7 @@ android {
     }
 
     defaultConfig {
-        signingConfig signingConfigs.debug
+        signingConfig signingConfigs.release
         applicationId 'com.qualcomm.ftcrobotcontroller'
         minSdkVersion 24
         //noinspection ExpiredTargetSdkVersion
@@ -79,8 +79,6 @@ android {
         matcher.find()
         def vName = matcher.group(1)
         //
-        versionCode vCode
-        versionName vName
     }
 
     // http://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.BuildType.html

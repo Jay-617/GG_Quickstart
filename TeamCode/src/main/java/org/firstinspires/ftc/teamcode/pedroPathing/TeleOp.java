@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;   // <-- required
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-// Jayden sucks get a life
 
 @TeleOp(name = "TeleOp", group = "A1")
 public class TeleOP extends LinearOpMode {
@@ -16,7 +15,7 @@ public class TeleOP extends LinearOpMode {
     private static final double OUTTAKE_POWER     = 1.0;   // outtake motor power when ON
 
     // Sorting mechanism positions (adjust for your linkage/servo)
-    private static final double SORT_LEFT   = 0.15;
+    private static final double SORT_LEFT    = 0.15;
     private static final double SORT_CENTER = 0.50;
     private static final double SORT_RIGHT  = 0.85;
 
