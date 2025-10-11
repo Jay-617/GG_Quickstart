@@ -5,13 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-<<<<<<< Updated upstream
-import com.qualcomm.robotcore.hardware.Servo;
-// Jayden sucks get a life
-=======
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.CRServo;
->>>>>>> Stashed changes
 
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -30,12 +25,6 @@ public class TeleOP extends LinearOpMode {
     public static boolean HEADING_HOLD_ENABLED = true;
     public static double HEADING_HOLD_KP   = 1.0;
 
-<<<<<<< Updated upstream
-    // Sorting mechanism positions (adjust for your linkage/servo)
-    private static final double SORT_LEFT   = 0.15;
-    private static final double SORT_CENTER = 0.50;
-    private static final double SORT_RIGHT  = 0.85;
-=======
     // === Mechanisms ===
     public static double INTAKE_POWER      = 1.0;   // A toggles intake motor power on/off
     public static double OUTTAKE_RPM       = 315.0; // B toggles both outtake motors at this RPM
@@ -47,16 +36,15 @@ public class TeleOP extends LinearOpMode {
 
     // Internal
     private double holdHeadingRad = 0.0;
->>>>>>> Stashed changes
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         // ======== Drivetrain (4 DC motors) ========
-        DcMotor fL = hardwareMap.dcMotor.get("fL");
-        DcMotor bL = hardwareMap.dcMotor.get("bL");
-        DcMotor fR = hardwareMap.dcMotor.get("fR");
-        DcMotor bR = hardwareMap.dcMotor.get("bR");
+        //DcMotor fL = hardwareMap.dcMotor.get("fL");
+        //DcMotor bL = hardwareMap.dcMotor.get("bL");
+        //DcMotor fR = hardwareMap.dcMotor.get("fR");
+        //DcMotor bR = hardwareMap.dcMotor.get("bR");
 
         fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -181,7 +169,7 @@ public class TeleOP extends LinearOpMode {
             boolean curA = gamepad1.a;
             if (curA && !prevA) {
                 intakeOn = !intakeOn;
-                intake.setPower(intakeOn ? INTAKE_POWER : 1);
+                intake.setPower(intakeOn ? INTAKE_POWER : 0.0);
             }
             prevA = curA;
 
@@ -204,7 +192,7 @@ public class TeleOP extends LinearOpMode {
             boolean curX = gamepad1.x;
             if (curX && !prevX) {
                 sorterOn = !sorterOn;
-                sorter.setPower(sorterOn ? SORTER_SPEED : 1.0);
+                sorter.setPower(sorterOn ? SORTER_SPEED : 0.0);
             }
             prevX = curX;
 
