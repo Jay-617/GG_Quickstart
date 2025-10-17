@@ -129,8 +129,8 @@ public class teleOpTesting extends LinearOpMode {
             lastY = currentY;
 
             if (counter_c % 2 == 0) {
-                spinner.setPower(.2);
-                sleep(1000);
+                spinner.setPower(.1);
+//                sleep(1000);
             } else {
                 intake.setPower(0);
             }
