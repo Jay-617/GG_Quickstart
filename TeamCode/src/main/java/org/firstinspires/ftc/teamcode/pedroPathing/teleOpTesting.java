@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -26,6 +27,8 @@ public class teleOpTesting extends LinearOpMode {
     public DcMotor outtakeL = null;
     public DcMotor outtakeR = null;
     public DcMotor spinner = null;
+    public Servo sorter;
+
 
     IMU imu;
 
@@ -47,6 +50,8 @@ public class teleOpTesting extends LinearOpMode {
         LB = hardwareMap.dcMotor.get("BL");
         RF = hardwareMap.dcMotor.get("FR");
         RB = hardwareMap.dcMotor.get("BR");
+        sorter = hardwareMap.servo.get("sorter");
+
 
         intake = hardwareMap.dcMotor.get("intake");
         outtakeL = hardwareMap.dcMotor.get("outtakeL");
@@ -188,6 +193,13 @@ public class teleOpTesting extends LinearOpMode {
                 spinner.setPower(0); // Stop spinner if neither is toggled
             }
 
+            if( gamepad2.dpad_up) {
+                sorter.setPosition(0);
+            }
+
+            if( gamepad2.dpad_down) {
+                sorter.setPosition(0);
+            }
 
             telemetry.update();
             idle(); // Let the system handle background tasks
