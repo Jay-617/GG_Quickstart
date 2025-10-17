@@ -32,11 +32,13 @@ public class teleOpTesting extends LinearOpMode {
     int counter = 1;
     int counter_b = 1;
     int counter_c = 1;
+    int counter_x = 1;
 
     // Track previous button state for toggles
     boolean lastB = false;
     boolean lastA = false;
     boolean lastY = false;
+    boolean lastX = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -121,7 +123,6 @@ public class teleOpTesting extends LinearOpMode {
                 intake.setPower(0);
             }
 
-            // Toggle spinner
             boolean currentY = gamepad2.y;
             if (currentY && !lastY) {
                 counter_c++;
@@ -129,8 +130,24 @@ public class teleOpTesting extends LinearOpMode {
             lastY = currentY;
 
             if (counter_c % 2 == 0) {
-                spinner.setPower(0.1);
-                sleep(1000); // Pauses for 1 second
+                spinner.setPower(0.07);
+//                sleep(1000); // ✅ Correct pause for 1 second
+            } else {
+                spinner.setPower(0); // ✅ Correct motor to stop
+            }
+
+
+
+            boolean currentX = gamepad2.x;
+            if (currentX && !lastX) {
+                counter_x++;
+            }
+            lastX = currentX;
+
+            if (counter_x % 2 == 0) {
+                spinner.setDirection(DcMotorSimple.Direction.REVERSE);
+                spinner.setPower(0.07);
+//                sleep(1000); // ✅ Correct pause for 1 second
             } else {
                 spinner.setPower(0); // ✅ Correct motor to stop
             }
