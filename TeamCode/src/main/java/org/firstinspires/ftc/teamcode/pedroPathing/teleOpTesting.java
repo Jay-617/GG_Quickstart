@@ -123,34 +123,35 @@ public class teleOpTesting extends LinearOpMode {
                 intake.setPower(0);
             }
 
-            boolean currentY = gamepad2.y;
-            if (currentY && !lastY) {
-                counter_c++;
-            }
-            lastY = currentY;
+//            boolean currentY = gamepad2.y;
+//            if (currentY && !lastY) {
+//                counter_c++;
+//            }
+//            lastY = currentY;
+//
+//            if (counter_c % 2 == 0) {
+//                spinner.setDirection(DcMotorSimple.Direction.FORWARD);
+//                spinner.setPower(.1);
+////                sleep(1000); // ✅ Correct pause for 1 second
+//            } else {
+//                spinner.setPower(0); // ✅ Correct motor to stop
+//            }
+//
 
-            if (counter_c % 2 == 0) {
-                spinner.setPower(.1);
-//                sleep(1000); // ✅ Correct pause for 1 second
-            } else {
-                spinner.setPower(0); // ✅ Correct motor to stop
-            }
 
-
-
-            boolean currentX = gamepad2.x;
-            if (currentX && !lastX) {
-                counter_x++;
-            }
-            lastX = currentX;
-
-            if (counter_x % 2 == 0) {
-                spinner.setDirection(DcMotorSimple.Direction.REVERSE);
-                spinner.setPower(.1);
-//                sleep(1000); // ✅ Correct pause for 1 second
-            } else {
-                spinner.setPower(0); // ✅ Correct motor to stop
-            }
+//            boolean currentX = gamepad2.x;
+//            if (currentX && !lastX) {
+//                counter_x++;
+//            }
+//            lastX = currentX;
+//
+//            if (counter_x % 2 == 0) {
+//                spinner.setDirection(DcMotorSimple.Direction.REVERSE);
+//                spinner.setPower(-.1);
+////                sleep(1000); // ✅ Correct pause for 1 second
+//            } else {
+//                spinner.setPower(0); // ✅ Correct motor to stop
+//            }
 
 
 //            if (counter_c % 2 == 0) {
@@ -165,7 +166,28 @@ public class teleOpTesting extends LinearOpMode {
 //                spinner.setPower(0); // ✅ Correct motor to stop
 //            }
 
+            boolean currentY = gamepad2.y;
+            if (currentY && !lastY) {
+                counter_c++;
+            }
+            lastY = currentY;
 
+            boolean currentX = gamepad2.x;
+            if (currentX && !lastX) {
+                counter_x++;
+            }
+            lastX = currentX;
+
+// Combined logic to prevent clashing
+            if (counter_c % 2 == 0) {
+                spinner.setDirection(DcMotorSimple.Direction.FORWARD);
+                spinner.setPower(0.07);
+            } else if (counter_x % 2 == 0) {
+                spinner.setDirection(DcMotorSimple.Direction.REVERSE);
+                spinner.setPower(0.07);
+            } else {
+                spinner.setPower(0); // Stop spinner if neither is toggled
+            }
 
 
             telemetry.update();
