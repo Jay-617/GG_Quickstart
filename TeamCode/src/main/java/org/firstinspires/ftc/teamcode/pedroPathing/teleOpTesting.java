@@ -180,10 +180,10 @@ public class teleOpTesting extends LinearOpMode {
 // Combined logic to prevent clashing
             if (counter_c % 2 == 0) {
                 spinner.setDirection(DcMotorSimple.Direction.FORWARD);
-                spinner.setPower(0.07);
+                spinner.setPower(0.1);
             } else if (counter_x % 2 == 0) {
                 spinner.setDirection(DcMotorSimple.Direction.REVERSE);
-                spinner.setPower(0.07);
+                spinner.setPower(0.1);
             } else {
                 spinner.setPower(0); // Stop spinner if neither is toggled
             }
