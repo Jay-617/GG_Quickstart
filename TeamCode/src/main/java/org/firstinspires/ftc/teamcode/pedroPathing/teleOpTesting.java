@@ -130,7 +130,7 @@ public class teleOpTesting extends LinearOpMode {
             lastY = currentY;
 
             if (counter_c % 2 == 0) {
-                spinner.setPower(0.07);
+                spinner.setPower(.1);
 //                sleep(1000); // ✅ Correct pause for 1 second
             } else {
                 spinner.setPower(0); // ✅ Correct motor to stop
@@ -146,7 +146,7 @@ public class teleOpTesting extends LinearOpMode {
 
             if (counter_x % 2 == 0) {
                 spinner.setDirection(DcMotorSimple.Direction.REVERSE);
-                spinner.setPower(0.07);
+                spinner.setPower(.1);
 //                sleep(1000); // ✅ Correct pause for 1 second
             } else {
                 spinner.setPower(0); // ✅ Correct motor to stop
