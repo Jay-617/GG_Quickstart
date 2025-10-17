@@ -107,7 +107,9 @@ public class brandonsAuto extends LinearOpMode {
         waitForStart();
 
         //BEGIN 30 SECOND AUTO
-        Drive(1);
+        Drive(1, 100);
+        RotateRight(1,50);
+        Spinner(1,100);
         //END AUTO
 
         telemetry.addData("Path", "Complete");
@@ -123,43 +125,55 @@ public class brandonsAuto extends LinearOpMode {
      *  3) Driver stops the opMode running.
      */
 
-    public void Drive (double speed) {
+    public void Drive (double speed, long time) {
         RF.setPower(speed);
         LF.setPower(speed);
         RB.setPower(speed);
         LB.setPower(speed);
+        this.sleep(time);
     }
-    public void StrafeLeft (double speed) {
+    public void StrafeLeft (double speed, long time) {
         RF.setPower(speed);
         LF.setPower(-speed);
         RB.setPower(-speed);
         LB.setPower(speed);
+        this.sleep(time);
     }
-    public void StrafeRight(double speed) {
+    public void StrafeRight(double speed, long time) {
         RF.setPower(-speed);
         LF.setPower(speed);
         RB.setPower(speed);
         LB.setPower(-speed);
+        this.sleep(time);
     }
-    public void RotateLeft(double speed) {
+    public void RotateLeft(double speed, long time) {
         RF.setPower(speed);
         LF.setPower(-speed);
         RB.setPower(speed);
         LB.setPower(-speed);
+        this.sleep(time);
     }
-    public void RotateRight(double speed) {
+    public void RotateRight(double speed, long time) {
         RF.setPower(-speed);
         LF.setPower(speed);
         RB.setPower(-speed);
         LB.setPower(speed);
+        this.sleep(time);
     }
-    public void Intake(double speed) {
+    public void Intake(double speed, long time) {
         intake.setPower(speed);
+        this.sleep(time);
     }
-    public void Outake(double speed) {
-        outtakeR.setPower(1);
-        outtakeL.setPower(1);
+    public void Outake(double speed, long time) {
+        outtakeR.setPower(speed);
+        outtakeL.setPower(speed);
+        this.sleep(time);
     }
+    public void Spinner(double speed, long time) {
+        spinner.setPower(speed);
+        this.sleep(time);
+    }
+
 
     public void encoderLift(double speed, double leftSide, double rightSide, double timeoutS) {
         /*int newLift1Target;
@@ -208,8 +222,8 @@ public class brandonsAuto extends LinearOpMode {
             lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            sleep(250);   // optional pause after each move.*/
-        }
+            sleep(250);   // optional pause after each move.
+        }*/
     }
 
 //Arm encoders
