@@ -31,10 +31,12 @@ public class teleOpTesting extends LinearOpMode {
 
     int counter = 1;
     int counter_b = 1;
+    int counter_c = 1;
 
     // Track previous button state for toggles
     boolean lastB = false;
     boolean lastA = false;
+    boolean lastY = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -118,6 +120,23 @@ public class teleOpTesting extends LinearOpMode {
             } else {
                 intake.setPower(0);
             }
+
+            // Toggle spinner
+            boolean currentY = gamepad2.y;
+            if (currentY && !lastY) {
+                counter_c++;
+            }
+            lastY = currentY;
+
+            if (counter_c % 2 == 0) {
+                spinner.setPower(.2);
+                sleep(1000);
+            } else {
+                intake.setPower(0);
+            }
+
+
+
 
             telemetry.update();
             idle(); // Let the system handle background tasks

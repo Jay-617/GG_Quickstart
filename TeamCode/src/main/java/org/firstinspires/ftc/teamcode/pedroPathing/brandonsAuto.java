@@ -211,7 +211,7 @@ public class brandonsAuto extends LinearOpMode {
             sleep(250);   // optional pause after each move.*/
         }
     }
-}
+
 //Arm encoders
     /*public void encoderarm(double speed, double fowardInches, double reverseInches, double timeoutS) {
         int newarmTarget;
