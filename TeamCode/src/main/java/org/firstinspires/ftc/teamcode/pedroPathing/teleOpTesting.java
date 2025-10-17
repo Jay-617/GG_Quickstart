@@ -162,7 +162,7 @@ public class teleOpTesting extends LinearOpMode {
                 }
            } else {
                 spinner.setPower(0); // ✅ Correct motor to stop
-            }
+           }
 
 
 
