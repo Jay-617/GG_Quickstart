@@ -129,10 +129,10 @@ public class teleOpTesting extends LinearOpMode {
             lastY = currentY;
 
             if (counter_c % 2 == 0) {
-                spinner.setPower(.1);
-//                sleep(1000);
+                spinner.setPower(0.1);
+                // sleep(1000); ❌ Bad idea in loops, see below
             } else {
-                intake.setPower(0);
+                spinner.setPower(0); // ✅ Correct motor to stop
             }
 
 
