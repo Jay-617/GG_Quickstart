@@ -154,17 +154,16 @@ public class teleOpTesting extends LinearOpMode {
 //            }
 
 
-//            if (counter_c % 2 == 0) {
-//                spinner.setPower(0.1);
-//                try {
-//                    Thread.sleep(1000); // wait 1 second
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                System.out.println("1 second later...");
-//            } else {
-//                spinner.setPower(0); // ✅ Correct motor to stop
-//            }
+           if (counter_c % 2 == 0) {
+                spinner.setPower(0.1);
+                try {
+                    Thread.sleep(1000); // wait 1 second
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+           } else {
+                spinner.setPower(0); // ✅ Correct motor to stop
+           }
 
             boolean currentY = gamepad2.y;
             if (currentY && !lastY) {
