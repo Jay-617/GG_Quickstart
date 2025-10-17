@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
-public class teleOpTesting extends LinearOpMode {
+public class testv2 extends LinearOpMode {
 
     // Motors
     public DcMotor LF = null;
@@ -34,14 +34,16 @@ public class teleOpTesting extends LinearOpMode {
     // Counters for toggles
     int counter = 1;    // outtake toggle
     int counter_b = 1;  // intake toggle
-    int counter_c = 1;  // spinner forward toggle (Y button)
-    int counter_x = 1;  // spinner reverse toggle (X button)
 
     // Track previous button states to detect new presses
     boolean lastB = false;
     boolean lastA = false;
     boolean lastY = false;
     boolean lastX = false;
+
+    // Spinner timing variables for 1-second spin
+    private long spinnerEndTime = 0;
+    private boolean spinnerRunning = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -128,32 +130,33 @@ public class teleOpTesting extends LinearOpMode {
                 intake.setPower(0);
             }
 
-            // Toggle spinner forward (Y button)
-            boolean currentY = gamepad2.y;
-            if (currentY && !lastY) {
-                counter_c++;
-            }
-            lastY = currentY;
+            // Spinner control - 1 second spin on Y (forward) or X (reverse)
 
-            // Toggle spinner reverse (X button)
-            boolean currentX = gamepad2.x;
-            if (currentX && !lastX) {
-                counter_x++;
+            // Stop spinner if 1 second elapsed
+            if (spinnerRunning && System.currentTimeMillis() > spinnerEndTime) {
+                spinner.setPower(0);
+                spinnerRunning = false;
             }
-            lastX = currentX;
 
-            // Spinner control: only one direction at a time to avoid clashing
-            if (counter_c % 2 == 0 && counter_x % 2 != 0) {
+            // Start spinner forward on Y press if not running
+            if (gamepad2.y && !lastY && !spinnerRunning) {
                 spinner.setDirection(DcMotorSimple.Direction.FORWARD);
                 spinner.setPower(0.1);
-                /// /////////////
-            } else if (counter_x % 2 == 0 && counter_c % 2 != 0) {
+                spinnerEndTime = System.currentTimeMillis() + 1000; // 1 second
+                spinnerRunning = true;
+            }
+
+            // Start spinner reverse on X press if not running
+            if (gamepad2.x && !lastX && !spinnerRunning) {
                 spinner.setDirection(DcMotorSimple.Direction.REVERSE);
                 spinner.setPower(0.1);
-                /// //////////////
-            } else {
-                spinner.setPower(0);
+                spinnerEndTime = System.currentTimeMillis() + 1000; // 1 second
+                spinnerRunning = true;
             }
+
+            // Update last button states for edge detection
+            lastY = gamepad2.y;
+            lastX = gamepad2.x;
 
             // Sorter servo control
             if (gamepad2.dpad_up) {
