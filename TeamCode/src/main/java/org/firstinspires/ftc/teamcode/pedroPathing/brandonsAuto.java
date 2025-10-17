@@ -107,8 +107,8 @@ public class brandonsAuto extends LinearOpMode {
         waitForStart();
 
         //BEGIN 30 SECOND AUTO
-        Drive(1, 100);
-        RotateRight(1,50);
+//        Drive(1, 100);
+//        RotateRight(1,50);
         Spinner(1,100);
         //END AUTO
 
@@ -224,8 +224,28 @@ public class brandonsAuto extends LinearOpMode {
 
             sleep(250);   // optional pause after each move.
         }*/
-    }
+    }}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 //Arm encoders
     /*public void encoderarm(double speed, double fowardInches, double reverseInches, double timeoutS) {
         int newarmTarget;
