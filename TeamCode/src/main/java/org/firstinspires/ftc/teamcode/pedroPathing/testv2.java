@@ -74,8 +74,8 @@ public class testv2 extends LinearOpMode {
         // Initialize IMU
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+                RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
+                RevHubOrientationOnRobot.UsbFacingDirection.LEFT
         );
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 

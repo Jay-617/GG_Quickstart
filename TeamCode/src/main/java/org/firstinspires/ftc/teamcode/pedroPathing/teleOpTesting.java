@@ -72,8 +72,8 @@ public class teleOpTesting extends LinearOpMode {
         // Initialize IMU
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+                RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
+                RevHubOrientationOnRobot.UsbFacingDirection.LEFT
         );
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
@@ -146,13 +146,19 @@ public class teleOpTesting extends LinearOpMode {
             if (counter_c % 2 == 0 && counter_x % 2 != 0) {
                 spinner.setDirection(DcMotorSimple.Direction.FORWARD);
                 spinner.setPower(0.1);
+                outtakeR.setPower(.1);
+                outtakeL.setPower(.1);
                 /// /////////////
             } else if (counter_x % 2 == 0 && counter_c % 2 != 0) {
                 spinner.setDirection(DcMotorSimple.Direction.REVERSE);
                 spinner.setPower(0.1);
+                outtakeR.setPower(.1);
+                outtakeL.setPower(.1);
                 /// //////////////
             } else {
                 spinner.setPower(0);
+                outtakeR.setPower(0);
+                outtakeL.setPower(0);
             }
 
             // Sorter servo control
