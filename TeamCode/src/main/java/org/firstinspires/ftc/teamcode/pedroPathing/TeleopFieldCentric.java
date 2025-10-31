@@ -21,6 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
     public DcMotor RB = null;
 
     public DcMotor Spinner = null;
+//    public servo lifter;
+//    public servo closer;
     IMU imu;
     /// //////////////////////////////////////
     @Override

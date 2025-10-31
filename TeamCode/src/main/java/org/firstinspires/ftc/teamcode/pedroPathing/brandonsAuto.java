@@ -43,10 +43,10 @@ public class brandonsAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException{
 
         // Initialize the drive system variables.
-        RF = hardwareMap.get(DcMotor.class, "RF");
-        LF = hardwareMap.get(DcMotor.class, "LF");
-        RB = hardwareMap.get(DcMotor.class, "RB");
-        LB = hardwareMap.get(DcMotor.class, "LB");
+        RF = hardwareMap.get(DcMotor.class, "FR");
+        LF = hardwareMap.get(DcMotor.class, "FL");
+        RB = hardwareMap.get(DcMotor.class, "BR");
+        LB = hardwareMap.get(DcMotor.class, "BL");
         intake = hardwareMap.get(DcMotor.class, "intake");
         outtakeL = hardwareMap.get(DcMotor.class, "outtakeL");
         outtakeR = hardwareMap.get(DcMotor.class, "outtakeR");
@@ -67,8 +67,8 @@ public class brandonsAuto extends LinearOpMode {
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        RF.setDirection(DcMotor.Direction.FORWARD);
-        LF.setDirection(DcMotor.Direction.REVERSE);
+        RF.setDirection(DcMotor.Direction.REVERSE);
+        LF.setDirection(DcMotor.Direction.FORWARD);
         RB.setDirection(DcMotor.Direction.FORWARD);
         LB.setDirection(DcMotor.Direction.REVERSE);
         spinner.setDirection(DcMotor.Direction.FORWARD);
@@ -106,11 +106,14 @@ public class brandonsAuto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+
+
         //BEGIN 30 SECOND AUTO
-//        Drive(1, 100);
-//        RotateRight(1,50);
-        Spinner(1,100);
-        //END AUTO
+        Drive(.1, 1000);
+//        Drive(0,20);
+//        RotateRight(0,1000);
+//        Spinner(0,100);
+//        //END AUTO
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
