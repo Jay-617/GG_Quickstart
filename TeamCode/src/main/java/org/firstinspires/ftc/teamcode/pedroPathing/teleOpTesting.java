@@ -155,10 +155,25 @@ public class teleOpTesting extends LinearOpMode {
 
             // Spinner forward (Y)
             if (gamepad2.y){
-                outtakeR.setPower(.3);
-                outtakeL.setPower(-.3);
                 EncoderSpinner(SPIN_SPEED, 5,.6);
             }
+
+            boolean currentX = gamepad2.x;
+//            if (currentX && !lastX) counter_x++;
+//            lastX = currentX;
+
+            if (counter_x % 2 != 0) {
+//
+                outtakeR.setPower(.3);
+                outtakeL.setPower(-.3);
+
+            } else {
+
+                outtakeR.setPower(0);
+                outtakeL.setPower(0);
+            }
+
+
 //            boolean currentY = gamepad2.y;
 //            if (currentY && !lastY) counter_c++;
 //            lastY = currentY;
