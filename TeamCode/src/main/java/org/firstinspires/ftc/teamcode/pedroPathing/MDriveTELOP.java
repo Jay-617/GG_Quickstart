@@ -80,7 +80,7 @@ public class MDriveTELOP extends LinearOpMode {
         sleep(2000);
 
         // --- Only set directions if motors exist ---
-        if (LF != null) LF.setDirection(DcMotor.Direction.FORWARD);
+        if (LF != null) LF.setDirection(DcMotor.Direction.REVERSE);
         if (RF != null) RF.setDirection(DcMotor.Direction.FORWARD);
         if (LB != null) LB.setDirection(DcMotor.Direction.REVERSE);
         if (RB != null) RB.setDirection(DcMotor.Direction.FORWARD);
@@ -134,39 +134,47 @@ public class MDriveTELOP extends LinearOpMode {
             boolean currentA = gamepad2.a;
             if (currentA && !lastA) counter_b++;
             lastA = currentA;
-            setMotorPower(intake, (counter_b % 2 == 0) ? 0.7 : 0);
+            setMotorPower(intake, (counter_b % 2 == 0) ? .5 : 0);
 
             // Spinner forward (Y)
-            if (gamepad2.y) EncoderSpinner(SPIN_SPEED, 5, .6);
+            if (gamepad2.y) EncoderSpinner(SPIN_SPEED, 8, .6);
 
-            // Spinner reverse (X)
-            boolean currentX = gamepad2.x;
-            if (currentX && !lastX) counter_x++;
-            lastX = currentX;
-            if (counter_x % 2 == 0) {
-                setMotorPower(outtakeR, 0.3);
-                setMotorPower(outtakeL, -0.3);
-            }
+//            // Spinner reverse (X)
+//            boolean currentX = gamepad2.x;
+//            if (currentX && !lastX) counter_x++;
+//            lastX = currentX;
+//            if (counter_x % 2 == 0) {
+//                setMotorPower(outtakeR, 0.3);
+//                setMotorPower(outtakeL, -0.3);
+//            }
 
             // Lifter toggle (D-pad up)
             boolean currentL = gamepad2.dpad_up;
             if (currentL && !lastL) counterL++;
             lastL = currentL;
-            setServoPosition(lifter, (counterL % 2 == 0) ? 0.8 : 0.7);
+            setServoPosition(lifter, (counterL % 2 == 0) ? 0.8 : 0.65);
 
             // Closer toggle (D-pad down)
             boolean currentC = gamepad2.dpad_down;
             if (currentC && !lastC) counterC++;
             lastC = currentC;
-            setServoPosition(closer, (counterC % 2 == 0) ? 0.6 : 0.5);
+            setServoPosition(closer, (counterC % 2 == 0) ? 0.6 : 0.48);
 
             // Left strafe
             if (gamepad1.left_bumper) {
                 double strafePower = 0.6;
-                setMotorPower(LF, strafePower);
+                setMotorPower(LF, -strafePower);
                 setMotorPower(RF, strafePower);
-                setMotorPower(LB, -strafePower);
+                setMotorPower(LB, strafePower);
                 setMotorPower(RB, -strafePower);
+            }
+            //right strafe
+            if (gamepad1.right_bumper) {
+                double strafePower = 0.6;
+                setMotorPower(LF, strafePower);
+                setMotorPower(RF, -strafePower);
+                setMotorPower(LB, -strafePower);
+                setMotorPower(RB, strafePower);
             }
         }
     }
@@ -219,6 +227,7 @@ public class MDriveTELOP extends LinearOpMode {
 
         spinner.setPower(0);
         spinner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        sleep(250);
+        //250
+        sleep(300);
     }
 }
