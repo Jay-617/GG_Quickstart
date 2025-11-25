@@ -109,7 +109,7 @@ public class brandonsAuto extends LinearOpMode {
 
 
         //BEGIN 30 SECOND AUTO
-        Drive(.1, 1000);
+        StrafeRight(.2, 3000);
 //        Drive(0,20);
 //        RotateRight(0,1000);
 //        Spinner(0,100);
@@ -143,8 +143,8 @@ public class brandonsAuto extends LinearOpMode {
         this.sleep(time);
     }
     public void StrafeRight(double speed, long time) {
-        RF.setPower(-speed);
-        LF.setPower(speed);
+        RF.setPower(speed);
+        LF.setPower(-speed);
         RB.setPower(speed);
         LB.setPower(-speed);
         this.sleep(time);

@@ -123,11 +123,12 @@ public class newFCTELEOP extends LinearOpMode {
             double adjustedLy = ly * Math.cos(heading) + lx * Math.sin(heading);
 
 
-            RB.setPower(((adjustedLy + adjustedLx - rx) / max) * drivePower);
-            LB.setPower(((adjustedLy - adjustedLx - rx) / max) * drivePower);
-            RF.setPower(((adjustedLy - adjustedLx + rx) / max) * drivePower);
-            LF.setPower(((adjustedLy + adjustedLx + rx) / max) * drivePower);
+
             //what the sigma - Joel
+            RB.setPower(((adjustedLy + adjustedLx + rx) / max) * drivePower);
+            LB.setPower(((adjustedLy - adjustedLx - rx) / max) * drivePower);
+            RF.setPower(((adjustedLy - adjustedLx - rx) / max) * drivePower);
+            LF.setPower(((adjustedLy + adjustedLx + rx) / max) * drivePower);
 
 
             // Toggle outtake with B button
