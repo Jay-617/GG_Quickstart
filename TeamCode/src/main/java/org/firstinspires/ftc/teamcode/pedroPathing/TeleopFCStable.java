@@ -98,20 +98,19 @@ public class TeleopFCStable extends LinearOpMode {
             if (invertedControls) { lx = -lx; ly = -ly; }
 
             // --- Reset yaw (Gamepad1 Y) ---
-            if (gamepad1.y && !lastYawReset && buttonDelay.seconds() > 0.3) {
-                initialYaw = getYaw();
-                buttonDelay.reset();
+            if (gamepad1.y && !lastYawReset) {
+                imu.resetYaw();     // fully resets IMU yaw to 0
             }
             lastYawReset = gamepad1.y;
 
-            // --- FIELD-CENTRIC MOVEMENT ---
-            double currentYaw = getYaw();
-            double yawOffset = currentYaw - initialYaw; // How much robot has turned
-            double cosA = Math.cos(-yawOffset); // Negative to rotate joystick relative to field
-            double sinA = Math.sin(-yawOffset);
+// --- FIELD-CENTRIC MOVEMENT ---
+            double yaw = getYaw();        // yaw is now zeroed after reset
+            double cosA = Math.cos(-yaw);
+            double sinA = Math.sin(-yaw);
 
             double tempX = lx * cosA - ly * sinA;
             double tempY = lx * sinA + ly * cosA;
+
 
             // --- Mecanum drive powers ---
             double frontLeftPower  = tempY + tempX + rx;
@@ -187,10 +186,11 @@ public class TeleopFCStable extends LinearOpMode {
             setServoPosition(closer, (counterCloser % 2 == 0) ? 0.6 : 0.48);
 
             // --- Telemetry ---
-            telemetry.addData("Yaw (deg)", Math.toDegrees(currentYaw));
+            telemetry.addData("Yaw (deg)", Math.toDegrees(yaw));
             telemetry.addData("Field-Centric Active", true);
             telemetry.addData("Inverted Controls", invertedControls);
             telemetry.update();
+
         }
     }
 
@@ -238,3 +238,4 @@ public class TeleopFCStable extends LinearOpMode {
         sleep(300);
     }
 }
+//192.168.43.1:8001 pannles
