@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-@TeleOp(name = "ASNAPPYField-Centric Drive + Mechanisms + Limit Switch PID + X Spin 30°")
+@TeleOp(name = "ASNAPPYField-Centric Drive + Mechanisms + Limit Switch PID + X Spin 30° Lifter Sequence")
 public class TeleopPIDSnappy extends LinearOpMode {
 
     // Drive motors
@@ -37,7 +37,7 @@ public class TeleopPIDSnappy extends LinearOpMode {
     private boolean lastLifterButton = false, lifterOn = false;
     private boolean lastCloserButton = false, closerOn = false;
     private boolean lastInvert = false, lastYawReset = false, lastY = false;
-    private boolean lastX = false; // X button
+    private boolean lastX = false;
     private boolean invertedControls = false;
     private ElapsedTime buttonDelay = new ElapsedTime();
 
@@ -51,6 +51,11 @@ public class TeleopPIDSnappy extends LinearOpMode {
     private int ticksPer55Degrees;
     private int ticksPer30Degrees;
     private long lastTime;
+
+    // ---------------- X Button Non-blocking sequence ----------------
+    private enum XSequence { IDLE, SPIN_30, LIFTER_UP, WAIT, LIFTER_DOWN }
+    private XSequence xSeqState = XSequence.IDLE;
+    private ElapsedTime xTimer = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -165,15 +170,44 @@ public class TeleopPIDSnappy extends LinearOpMode {
             }
 
             // ----------------- SPINNER PID -----------------
-            // Y button: 55° increment
             if (gamepad2.y && !lastY) targetTicks += ticksPer55Degrees;
             lastY = gamepad2.y;
 
-            // X button: 30° increment
-            if (gamepad2.x && !lastX) targetTicks += ticksPer30Degrees;
+            // ----------------- X BUTTON NON-BLOCKING SEQUENCE -----------------
+            if (gamepad2.x && !lastX && xSeqState == XSequence.IDLE) {
+                xSeqState = XSequence.SPIN_30;
+            }
             lastX = gamepad2.x;
 
-            // Run PID
+            switch (xSeqState) {
+                case SPIN_30:
+                    targetTicks += ticksPer30Degrees;
+                    xTimer.reset();
+                    xSeqState = XSequence.LIFTER_UP;
+                    break;
+
+                case LIFTER_UP:
+                    if (lifter != null) lifter.setPosition(0.81); // lift up
+                    xTimer.reset();
+                    xSeqState = XSequence.WAIT;
+                    break;
+
+                case WAIT:
+                    if (xTimer.seconds() >= 0.5) {
+                        xSeqState = XSequence.LIFTER_DOWN;
+                    }
+                    break;
+
+                case LIFTER_DOWN:
+                    if (lifter != null) lifter.setPosition(0.65); // bring down
+                    xSeqState = XSequence.IDLE;
+                    break;
+
+                case IDLE:
+                default:
+                    break;
+            }
+
             runPID(targetTicks);
 
             // ----------------- MECHANISMS TOGGLES -----------------
@@ -184,11 +218,14 @@ public class TeleopPIDSnappy extends LinearOpMode {
             if (gamepad2.b && !lastOuttakeButton) outtakeOn = !outtakeOn;
             lastOuttakeButton = gamepad2.b;
             setMotorPower(outtakeL, outtakeOn ? 0.55 : 0);
-            setMotorPower(outtakeR, outtakeOn ? 0.53 : 0);
+            setMotorPower(outtakeR, outtakeOn ? 0.55 : 0);
 
-            if (gamepad2.dpad_up && !lastLifterButton) lifterOn = !lifterOn;
-            lastLifterButton = gamepad2.dpad_up;
-            setServoPosition(lifter, lifterOn ? 0.81 : 0.65);
+            // Only allow D-pad lifter control if X sequence is idle
+            if (xSeqState == XSequence.IDLE) {
+                if (gamepad2.dpad_up && !lastLifterButton) lifterOn = !lifterOn;
+                lastLifterButton = gamepad2.dpad_up;
+                setServoPosition(lifter, lifterOn ? 0.81 : 0.65);
+            }
 
             if (gamepad2.dpad_down && !lastCloserButton) closerOn = !closerOn;
             lastCloserButton = gamepad2.dpad_down;
@@ -202,7 +239,7 @@ public class TeleopPIDSnappy extends LinearOpMode {
             telemetry.addData("Intake", intakeOn);
             telemetry.addData("Outtake", outtakeOn);
             telemetry.addData("Lifter", lifterOn);
-            telemetry.addData("Closer", closerOn);
+            telemetry.addData("X Sequence", xSeqState);
             telemetry.update();
         }
     }
