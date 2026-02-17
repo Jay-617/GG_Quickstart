@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
+
+
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
@@ -10,7 +12,11 @@ import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(12.3)
@@ -20,7 +26,11 @@ public class Constants {
             .headingPIDFCoefficients(new PIDFCoefficients(1,0,0.01,0.025))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.03,0,0.00001,0.6,0.03))
             .centripetalScaling(0.0005);
+
+
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+
+
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(.8)//adjust if needed
             .rightFrontMotorName("FR")
@@ -33,6 +43,8 @@ public class Constants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .xVelocity( 63.90461502675936)
             .yVelocity(48.1070374015748);
+
+
     public static PinpointConstants localizerConstants = new PinpointConstants()
             .forwardPodY(-6.75)
             .strafePodX(5.75)

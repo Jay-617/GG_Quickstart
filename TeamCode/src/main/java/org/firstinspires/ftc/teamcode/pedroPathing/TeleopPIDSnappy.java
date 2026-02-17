@@ -1,269 +1,310 @@
-//package org.firstinspires.ftc.teamcode.pedroPathing;
-//
-//import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-//import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-//import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-//import com.qualcomm.robotcore.hardware.DcMotor;
-//import com.qualcomm.robotcore.hardware.Servo;
-//import com.qualcomm.robotcore.hardware.IMU;
-//import com.qualcomm.robotcore.hardware.DigitalChannel;
-//import com.qualcomm.robotcore.util.ElapsedTime;
-//
-//import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-//import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-//
-//@TeleOp(name = "ASNAPPYField-Centric Drive + Mechanisms + Limit Switch PID + X Spin 30°")
-//public class TeleopPIDSnappy extends LinearOpMode {
-//
-//    // Drive motors
-//    private DcMotor LF, RF, LB, RB;
-//
-//    // Mechanisms
-//    private DcMotor intake, outtakeL, outtakeR, spinner;
-//    private Servo lifter, closer;
-//
-//    // IMU
-//    private IMU imu;
-//
-//    // Limit switch
-//    private DigitalChannel limitSwitch;
-//    private boolean limitActive = false;
-//    private boolean forwardClearStage = false;
-//    private ElapsedTime limitTimer = new ElapsedTime();
-//
-//    // Button states
-//    private boolean lastIntakeButton = false, intakeOn = false;
-//    private boolean lastOuttakeButton = false, outtakeOn = false;
-//    private boolean lastLifterButton = false, lifterOn = false;
-//    private boolean lastCloserButton = false, closerOn = false;
-//    private boolean lastLBumberButton = false, LBumberOn = false;
-//    private boolean lastRBumberButton = false, RBumberOn = false;
-//    private boolean lastRBumberButton = false, BumberOn = false;
-//    private boolean lastInvert = false, lastYawReset = false, lastY = false;
-//    private boolean lastX = false; // X button
-//    private boolean invertedControls = false;
-//    private ElapsedTime buttonDelay = new ElapsedTime();
-//
-//    // PID constants
-//    double kP = 0.006, kI = 0, kD = 0.000003;
-//    double integral = 0, lastError = 0, integralMax = 3000;
-//
-//    // Spinner
-//    private int targetTicks = 0;
-//    double TICKS_PER_REV = 753.2, GEAR_RATIO = 1.0;
-//    private int ticksPer55Degrees;
-//    private int ticksPer30Degrees;
-//    private long lastTime;
-//
-//    @Override
-//    public void runOpMode() {
-//
-//        // Motors
-//        LF = getMotor("FL"); LB = getMotor("BL");
-//        RF = getMotor("FR"); RB = getMotor("BR");
-//        intake = getMotor("intake"); outtakeL = getMotor("outtakeL"); outtakeR = getMotor("outtakeR");
-//        spinner = getMotor("spinner");
-//        lifter = getServo("lifter"); closer = getServo("closer");
-//
-//        // Directions
-//        if (LF != null) LF.setDirection(DcMotor.Direction.REVERSE);
-//        if (LB != null) LB.setDirection(DcMotor.Direction.REVERSE);
-//        if (RF != null) RF.setDirection(DcMotor.Direction.FORWARD);
-//        if (RB != null) RB.setDirection(DcMotor.Direction.FORWARD);
-//        if (spinner != null) spinner.setDirection(DcMotor.Direction.REVERSE);
-//        if (outtakeL != null) outtakeL.setDirection(DcMotor.Direction.REVERSE);
-//        if (outtakeR != null) outtakeR.setDirection(DcMotor.Direction.FORWARD);
-//
-//        // IMU
-//        imu = hardwareMap.get(IMU.class, "imu");
-//        imu.initialize(new IMU.Parameters(
-//                new RevHubOrientationOnRobot(
-//                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
-//                        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
-//
-//        // Limit switch
-//        limitSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
-//        limitSwitch.setMode(DigitalChannel.Mode.INPUT);
-//
-//        // Spinner encoder reset
-//        spinner.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        spinner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//        // Compute degrees to ticks
-//        ticksPer55Degrees = (int)((55.0 / 360.0) * TICKS_PER_REV * GEAR_RATIO);
-//        ticksPer30Degrees = (int)((30.0 / 360.0) * TICKS_PER_REV * GEAR_RATIO);
-//
-//        lastTime = System.nanoTime();
-//
-//        telemetry.addLine("READY");
-//        telemetry.update();
-//        waitForStart();
-//
-//        while (opModeIsActive()) {
-//
-//            // ----------------- FIELD-CENTRIC DRIVE -----------------
-//            double lx = gamepad1.left_stick_x;
-//            double ly = -gamepad1.left_stick_y;
-//            double rx = gamepad1.right_stick_x;
-//
-//            if (gamepad1.b && !lastInvert && buttonDelay.seconds() > 0.3) {
-//                invertedControls = !invertedControls;
-//                buttonDelay.reset();
-//            }
-//            lastInvert = gamepad1.b;
-//            if (invertedControls) { lx = -lx; ly = -ly; }
-//            if (gamepad1.y && !lastYawReset) imu.resetYaw();
-//            lastYawReset = gamepad1.y;
-//
-//            double yaw = getYaw();
-//            double cosA = Math.cos(-yaw);
-//            double sinA = Math.sin(-yaw);
-//            double tempX = lx * cosA - ly * sinA;
-//            double tempY = lx * sinA + ly * cosA;
-//
-//            double fl = tempY + tempX + rx;
-//            double bl = tempY - tempX + rx;
-//            double fr = tempY - tempX - rx;
-//            double br = tempY + tempX - rx;
-//
-//            double max = Math.max(Math.max(Math.abs(fl), Math.abs(bl)), Math.max(Math.abs(fr), Math.abs(br)));
-//            if (max > 1.0) { fl /= max; bl /= max; fr /= max; br /= max; }
-//
-//            double speed = 1 - (0.6 * gamepad1.right_trigger);
-//            setMotorPower(LF, fl * speed);
-//            setMotorPower(LB, bl * speed);
-//            setMotorPower(RF, fr * speed);
-//            setMotorPower(RB, br * speed);
-//
-//            // ----------------- LIMIT SWITCH LOGIC -----------------
-//            boolean pressed = !limitSwitch.getState();
-//            if (pressed && !limitActive) {
-//                limitActive = true;
-//                forwardClearStage = false;
-//                limitTimer.reset();
-//                spinner.setPower(0);
-//                spinner.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                spinner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//                targetTicks = 0;
-//                integral = 0;
-//                lastError = 0;
-//            }
-//            if (limitActive) {
-//                if (limitTimer.seconds() < 0.5) spinner.setPower(0);
-//                else if (!forwardClearStage) {
-//                    int eightDegreeTicks = (int)((8.0 / 360.0) * TICKS_PER_REV);
-//                    spinner.setTargetPosition(eightDegreeTicks);
-//                    spinner.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                    spinner.setPower(0.2);
-//                    if (!spinner.isBusy()) {
-//                        spinner.setPower(0);
-//                        spinner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//                        spinner.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                        spinner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//                        forwardClearStage = true;
-//                        limitActive = false;
-//                    }
-//                }
-//                continue; // skip PID while limit switch active
-//            }
-//
-//            // ----------------- SEQUENCE TOGGLES ----------------- // with the top buttons and the left button on the toggle
-//            if (gamepad2.left_bumper && !lastLBumberButton) intakeOn = !intakeOn;
-////            lastLBumberButton = gamepad2.left_bumper;
-////            setMotorPower(intake, intakeOn ? 0.5 : 0);
-//
-//            if (gamepad2.right_bumper && !lastRBumberButton) outtakeOn = !outtakeOn;
-//            lastRBumberButton = gamepad2.right_bumper;
-////            setMotorPower(outtakeL, outtakeOn ? 0.55 : 0);
-////            setMotorPower(outtakeR, outtakeOn ? 0.53 : 0);
-//
-//            if (gamepad2.dpad_up && !lastLifterButton) lifterOn = !lifterOn;
-//            lastLifterButton = gamepad2.dpad_up;
-//            setServoPosition(lifter, lifterOn ? 0.81 : 0.65);
-//
-//            // ----------------- SPINNER PID -----------------
-//            // Y button: 55° increment
-//            if (gamepad2.y && !lastY) targetTicks += ticksPer55Degrees;
-//            lastY = gamepad2.y;
-//
-//            // X button: 30° increment
-//            if (gamepad2.x && !lastX) targetTicks += ticksPer30Degrees;
-//            lastX = gamepad2.x;
-//
-//            // Run PID
-//            runPID(targetTicks);
-//
-//            // ----------------- MECHANISMS TOGGLES -----------------
-//            if (gamepad2.a && !lastIntakeButton) intakeOn = !intakeOn;
-//            lastIntakeButton = gamepad2.a;
-//            setMotorPower(intake, intakeOn ? 0.5 : 0);
-//
-//            if (gamepad2.b && !lastOuttakeButton) outtakeOn = !outtakeOn;
-//            lastOuttakeButton = gamepad2.b;
-//            setMotorPower(outtakeL, outtakeOn ? 0.55 : 0);
-//            setMotorPower(outtakeR, outtakeOn ? 0.53 : 0);
-//
-//            if (gamepad2.dpad_up && !lastLifterButton) lifterOn = !lifterOn;
-//            lastLifterButton = gamepad2.dpad_up;
-//            setServoPosition(lifter, lifterOn ? 0.81 : 0.65);
-//
-//            if (gamepad2.dpad_down && !lastCloserButton) closerOn = !closerOn;
-//            lastCloserButton = gamepad2.dpad_down;
-//            setServoPosition(closer, closerOn ? 0.6 : 0.48);
-//
-//            // ----------------- TELEMETRY -----------------
-//            telemetry.addData("Yaw", Math.toDegrees(yaw));
-//            telemetry.addData("Spinner Pos", spinner.getCurrentPosition());
-//            telemetry.addData("Spinner Target", targetTicks);
-//            telemetry.addData("Limit Active", limitActive);
-//            telemetry.addData("Intake", intakeOn);
-//            telemetry.addData("Outtake", outtakeOn);
-//            telemetry.addData("Lifter", lifterOn);
-//            telemetry.addData("Closer", closerOn);
-//            telemetry.update();
-//        }
-//    }
-//
-//    private void runPID(int target) {
-//        if (spinner == null) return;
-//        long now = System.nanoTime();
-//        double dt = (now - lastTime) / 1e9;
-//        dt = Math.max(0.001, Math.min(dt, 0.05));
-//        lastTime = now;
-//
-//        double pos = spinner.getCurrentPosition();
-//        double error = target - pos;
-//        integral += error * dt;
-//        integral = Math.max(-integralMax, Math.min(integral, integralMax));
-//
-//        double derivative = (error - lastError) / dt;
-//        lastError = error;
-//
-//        double output = kP * error + kI * integral + kD * derivative;
-//        output = Math.max(-0.3, Math.min(output, 0.3));
-//
-//        spinner.setPower(output);
-//    }
-//
-//    private double getYaw() {
-//        if (imu == null) return 0;
-//        YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
-//        return angles.getYaw(AngleUnit.RADIANS);
-//    }
-//
-//    private DcMotor getMotor(String name) {
-//        try { return hardwareMap.dcMotor.get(name); } catch (Exception e) { return null; }
-//    }
-//
-//    private Servo getServo(String name) {
-//        try { return hardwareMap.servo.get(name); } catch (Exception e) { return null; }
-//    }
-//
-//    private void setMotorPower(DcMotor motor, double power) {
-//        if (motor != null) motor.setPower(power);
-//    }
-//
-//    private void setServoPosition(Servo servo, double pos) {
-//        if (servo != null) servo.setPosition(pos);
-//    }
-//}
+package org.firstinspires.ftc.teamcode.pedroPathing;
+
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+
+@Disabled
+@TeleOp(name = "A SnappyTeleOp PID Spinner + X Sequence FIXED (Field-Centric Merge)")
+public class TeleopPIDSnappy extends LinearOpMode {
+
+    // ---------------- HARDWARE ----------------
+    DcMotor LF, RF, LB, RB;
+    DcMotor intake, outtakeL, outtakeR, spinner;
+    Servo lifter, closer;
+    IMU imu;
+    DigitalChannel limitSwitch;
+
+    // ---------------- PID ----------------
+    double kP = 0.006, kI = 0, kD = 0.000003;
+    double integral = 0, lastError = 0, integralMax = 3000;
+    boolean pidEnabled = true;
+    int targetTicks = 0;
+    long lastTime;
+
+    // ---------------- STALL ----------------
+    int lastSpinnerPos = 0;
+    boolean spinnerStalled = false;
+    ElapsedTime stallTimer = new ElapsedTime();
+    ElapsedTime stallCooldown = new ElapsedTime();
+
+    // ---------------- CONSTANTS ----------------
+    final double TICKS_PER_REV = 753.2;
+    int ticks40, ticks55;
+
+    // ---------------- LIMIT SWITCH ----------------
+    enum LimitState { IDLE, STOP, CLEAR }
+    LimitState limitState = LimitState.IDLE;
+    ElapsedTime limitTimer = new ElapsedTime();
+
+    // ---------------- X SEQUENCE ----------------
+    enum XState { IDLE, BACK, LIFT, FORWARD }
+    XState xState = XState.IDLE;
+    ElapsedTime xTimer = new ElapsedTime();
+
+    // ---------------- BUTTON MEMORY ----------------
+    boolean lastX, lastY;
+    boolean lastIntake, intakeOn;
+    boolean lastOuttake, outtakeOn;
+    boolean lastCloser, closerOn;
+    boolean lastLifter, lifterOn;
+    boolean lastInvert = false;
+    boolean invertedControls = false;
+    ElapsedTime buttonDelay = new ElapsedTime();
+    boolean lastYawReset = false;
+
+    @Override
+    public void runOpMode() {
+
+        // ---------------- MAP ----------------
+        LF = hardwareMap.dcMotor.get("FL");
+        LB = hardwareMap.dcMotor.get("BL");
+        RF = hardwareMap.dcMotor.get("FR");
+        RB = hardwareMap.dcMotor.get("BR");
+
+        intake = hardwareMap.dcMotor.get("intake");
+        outtakeL = hardwareMap.dcMotor.get("outtakeL");
+        outtakeR = hardwareMap.dcMotor.get("outtakeR");
+        spinner = hardwareMap.dcMotor.get("spinner");
+
+        lifter = hardwareMap.servo.get("lifter");
+        closer = hardwareMap.servo.get("closer");
+
+        LF.setDirection(DcMotor.Direction.REVERSE);
+        LB.setDirection(DcMotor.Direction.REVERSE);
+        spinner.setDirection(DcMotor.Direction.REVERSE);
+
+        imu = hardwareMap.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
+
+        limitSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
+        limitSwitch.setMode(DigitalChannel.Mode.INPUT);
+
+        spinner.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        spinner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        ticks40 = (int)((40.0 / 360.0) * TICKS_PER_REV);
+        ticks55 = (int)((55.0 / 360.0) * TICKS_PER_REV);
+
+        lastTime = System.nanoTime();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+
+            // ---------------- DRIVE / FIELD-CENTRIC ----------------
+            double lx = gamepad1.left_stick_x;
+            double ly = -gamepad1.left_stick_y;
+            double rx = gamepad1.right_stick_x;
+
+            if (gamepad1.b && !lastInvert && buttonDelay.seconds() > 0.3) {
+                invertedControls = !invertedControls;
+                buttonDelay.reset();
+            }
+            lastInvert = gamepad1.b;
+            if (invertedControls) { lx = -lx; ly = -ly; }
+
+            if (gamepad1.y && !lastYawReset) imu.resetYaw();
+            lastYawReset = gamepad1.y;
+
+            double yaw = getYaw();
+            double cosA = Math.cos(-yaw);
+            double sinA = Math.sin(-yaw);
+
+            double tempX = lx * cosA - ly * sinA;
+            double tempY = lx * sinA + ly * cosA;
+
+            double fl = tempY + tempX + rx;
+            double bl = tempY - tempX + rx;
+            double fr = tempY - tempX - rx;
+            double br = tempY + tempX - rx;
+
+            double speed = 0.8 +(0.2*gamepad1.left_trigger) - (0.6 * gamepad1.right_trigger);
+            setDrive(fl * speed, bl * speed, fr * speed, br * speed);
+
+            // ---------------- LIMIT SWITCH ----------------
+            boolean pressed = !limitSwitch.getState();
+            switch (limitState) {
+                case IDLE:
+                    if (pressed) {
+                        spinner.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        spinner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        targetTicks = 0;
+                        integral = 0;
+                        lastError = 0;
+                        limitTimer.reset();
+                        limitState = LimitState.STOP;
+                    }
+                    break;
+                case STOP:
+                    if (limitTimer.seconds() > 0.25) {
+                        targetTicks = (int)((8.0 / 360.0) * TICKS_PER_REV);
+                        limitState = LimitState.CLEAR;
+                    }
+                    break;
+                case CLEAR:
+                    if (Math.abs(spinner.getCurrentPosition() - targetTicks) < 5) {
+                        spinner.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        spinner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        targetTicks = 0;
+                        limitState = LimitState.IDLE;
+                    }
+                    break;
+            }
+
+            // ---------------- X BUTTON ----------------
+            if (gamepad2.x && !lastX && xState == XState.IDLE) {
+                xState = XState.BACK;
+            }
+            lastX = gamepad2.x;
+
+            switch (xState) {
+                case BACK:
+                    targetTicks -= ticks40;
+                    xTimer.reset();
+                    xState = XState.LIFT;
+                    break;
+                case LIFT:
+                    lifter.setPosition(0.81); // lifter up
+                    xTimer.reset();
+                    xState = XState.FORWARD;
+                    break;
+                case FORWARD:
+                    if (xTimer.seconds() >= 0.5) {
+                        targetTicks += ticks40;
+                        lifter.setPosition(0.65); // lifter down
+                        xState = XState.IDLE;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            // ---------------- Y BUTTON ----------------
+            if (gamepad2.y && !lastY) targetTicks += ticks55;
+            lastY = gamepad2.y;
+
+            // ---------------- PID ----------------
+            if (pidEnabled && !spinnerStalled) {
+                runPID(targetTicks);
+            } else {
+                spinner.setPower(0);
+            }
+
+            // ---------------- STALL DETECTION ----------------
+            int pos = spinner.getCurrentPosition();
+            double power = spinner.getPower();
+            if (Math.abs(pos - lastSpinnerPos) < 2 && Math.abs(power) > 0.25) {
+                if (stallTimer.seconds() > 0.4) {
+                    spinnerStalled = true;
+                    pidEnabled = false;
+                    spinner.setPower(0);
+                    stallCooldown.reset();
+                }
+            } else {
+                stallTimer.reset();
+            }
+            lastSpinnerPos = pos;
+
+            if (spinnerStalled && stallCooldown.seconds() > 1.0) {
+                spinnerStalled = false;
+                pidEnabled = true;
+                integral = 0;
+                lastError = 0;
+            }
+
+            // ---------------- MECHANISMS ----------------
+            // Intake toggle and reverse
+            if (gamepad2.a && !lastIntake) intakeOn = !intakeOn;
+            lastIntake = gamepad2.a;
+
+            double intakePower = 0;
+            if (gamepad2.left_trigger > 0.1) { // reverse override
+                intakePower = -0.5;
+            } else if (intakeOn) {
+                intakePower = 0.5;
+            } else {
+                intakePower = 0;
+            }
+            intake.setPower(intakePower);
+
+            // Outtake
+            if (gamepad2.b && !lastOuttake) outtakeOn = !outtakeOn;
+            lastOuttake = gamepad2.b;
+            outtakeL.setPower(outtakeOn ? -1 : 0);
+            outtakeR.setPower(outtakeOn ? 1 : 0);
+
+            // Closer
+            if (gamepad2.dpad_down && !lastCloser) closerOn = !closerOn;
+            lastCloser = gamepad2.dpad_down;
+            closer.setPosition(closerOn ? 0.6 : 0.48);
+
+            // Lifter
+            if (xState == XState.IDLE) {
+                if (gamepad2.dpad_up && !lastLifter) lifterOn = !lifterOn;
+                lastLifter = gamepad2.dpad_up;
+                lifter.setPosition(lifterOn ? 0.82 : 0.65);
+            }
+
+            // ---------------- TELEMETRY ----------------
+            telemetry.addData("X State", xState);
+            telemetry.addData("Spinner Pos", pos);
+            telemetry.addData("STALL", spinnerStalled);
+            telemetry.addData("Yaw", Math.toDegrees(yaw));
+
+            telemetry.addData("Intake", intakePower > 0 ? "\u2705 ON" : (intakePower < 0 ? "\u26AB REVERSE" : "\u274C OFF"));
+            telemetry.addData("Outtake", outtakeOn ? "\u2705 ON" : "\u274C OFF");
+            telemetry.addData("Lifter", lifterOn ? "\u2705 UP" : "\u274C DOWN");
+            telemetry.addData("Closer", closerOn ? "\u2705 UP" : "\u274C DOWN");
+
+            telemetry.update();
+        }
+    }
+
+    private void runPID(int target) {
+        long now = System.nanoTime();
+        double dt = Math.max(0.001, Math.min((now - lastTime) / 1e9, 0.05));
+        lastTime = now;
+
+        double error = target - spinner.getCurrentPosition();
+
+        integral += error * dt;
+        integral = Math.max(-integralMax, Math.min(integral, integralMax));
+
+        double derivative = (error - lastError) / dt;
+        lastError = error;
+
+        double output = kP * error + kI * integral + kD * derivative;
+        output = Math.max(-0.3, Math.min(output, 0.3));
+
+        spinner.setPower(output);
+    }
+
+    private double getYaw() {
+        YawPitchRollAngles a = imu.getRobotYawPitchRollAngles();
+        return a.getYaw(AngleUnit.RADIANS);
+    }
+
+    private void setDrive(double fl, double bl, double fr, double br) {
+        double max = Math.max(Math.max(Math.abs(fl), Math.abs(bl)),
+                Math.max(Math.abs(fr), Math.abs(br)));
+        if (max > 1.0) { fl/=max; bl/=max; fr/=max; br/=max; }
+
+        LF.setPower(fl);
+        LB.setPower(bl);
+        RF.setPower(fr);
+        RB.setPower(br);
+    }
+}
